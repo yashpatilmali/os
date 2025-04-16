@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <limits.h>
+
+int main() {
+    int n;
+    
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+    
+
+    int burstTime[n], remainingTime[n], completionTime[n];
+    int waitingTime[n], turnaroundTime[n];
+    int arrivalTime[n];  
+    
+   
+    for (int i = 0; i < n; i++) {
+        arrivalTime[i] = 0;
+        printf("Enter Burst Time for Process %d: ", i + 1);
+        scanf("%d", &burstTime[i]);
+        remainingTime[i] = burstTime[i];
+    }
+    
+    int time = 0, completed = 0;
+    
+    while (completed < n) {
+        int smallest = -1;
+        int minTime = INT_MAX;
+        
+
+        for (int i = 0; i < n; i++) {
+            if (arrivalTime[i] <= time && remainingTime[i] > 0 && remainingTime[i] < minTime) {
+                minTime = remainingTime[i];
+                smallest = i;
+            }
+        }
+        
+        if (smallest == -1) {
+            time++;
+            continue;
+        }
+        
+      
+        remainingTime[smallest]--;
+        time++;
+        
+       
+        if (remainingTime[smallest] == 0) {
+            completionTime[smallest] = time;
+            completed++;
+        }
+    }
+    
+    int totalWaitingTime = 0, totalTurnaroundTime = 0;
+    for (int i = 0; i < n; i++) {
+        turnaroundTime[i] = completionTime[i] - arrivalTime[i];
+        waitingTime[i] = turnaroundTime[i] - burstTime[i];
+        totalWaitingTime += waitingTime[i];
+        totalTurnaroundTime += turnaroundTime[i];
+    }
+    
+    printf("\nProcess\tBurst Time\tCompletion Time\tTurnaround Time\tWaiting Time\n");
+    for (int i = 0; i < n; i++) {
+        printf("P%d\t%d\t\t%d\t\t%d\t\t%d\n", 
+               i + 1, burstTime[i], completionTime[i], turnaroundTime[i], waitingTime[i]);
+    }
+    
+   
+    printf("\nAverage Waiting Time: %.2f\n", (float)totalWaitingTime / n);
+    printf("Average Turnaround Time: %.2f\n", (float)totalTurnaroundTime / n);
+    
+    return 0;
+}
